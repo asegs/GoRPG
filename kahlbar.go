@@ -8,6 +8,7 @@ import (
 )
 
 const MAX_ITEMS = 25
+//In the future, have this auto increment if more needed and start at 3
 const MAX_DIALOGUES = 100
 const USER_DATA_SIZE = 3
 
@@ -126,7 +127,9 @@ func initializeDialogue(){
 	}
 }
 
-
+/*
+This is where things are going awry, everything is just being added to tree for the original parent.
+*/
 func treeInsert(toPlace dialogue,parent dialogue) dialogue{
 	if toPlace.order-1 == parent.order{
 		parent.children[parent.childrenCount] = &toPlace
