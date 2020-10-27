@@ -8,7 +8,6 @@ import (
 )
 
 const MAX_ITEMS = 25
-//In the future, have this auto increment if more needed and start at 3
 const MAX_DIALOGUES = 100
 const USER_DATA_SIZE = 3
 
@@ -127,22 +126,38 @@ func initializeDialogue(){
 	}
 }
 
-/*
-This is where things are going awry, everything is just being added to tree for the original parent.
-*/
-func treeInsert(toPlace dialogue,parent dialogue) dialogue{
+
+//Why is this damn language so finnicky
+func insert(root dialogue,key dialogue)dialogue{
+	if &root == nil{
+		return key
+	}
+	if root.order+1==key.order{
+		root.children[root.childrenCount] = &key
+		root.childrenCount++
+		return root
+	}
+	root.children[root.childrenCount] = insert(root.children[root.childrenCount],*key)
+	return root
+}
+
+
+func treeInsert(toPlace dialogue,parent dialogue){
 	if toPlace.order-1 == parent.order{
 		parent.children[parent.childrenCount] = &toPlace
 		parent.childrenCount++
-		return parent
+		fmt.Println(parent.order)
+		return
 	}
-	return treeInsert(toPlace,*parent.children[parent.childrenCount-1])
+	treeInsert(toPlace,*parent.children[parent.childrenCount-1])
+	return
 }
 func main(){
 	initializeNPCS()
 	initializeDialogue()
 	for i:=2;i<len(DialogueMap);i++{
-		DialogueMap[1]=treeInsert(DialogueMap[2],DialogueMap[1])
+		fmt.Println(DialogueMap[1])
+		insert(DialogueMap[1],DialogueMap[i])
+		fmt.Println(DialogueMap[1])
 	}
-	fmt.Println(DialogueMap[1])
 }
