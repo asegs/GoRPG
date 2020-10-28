@@ -128,13 +128,14 @@ func initializeDialogue(){
 
 
 func insert(root dialogue,key string,order int){
+	var addy *dialogue
 	for order>1{
-		root = *root.children[root.childrenCount]
+		addy = root.children[root.childrenCount]
 		order--
 	}
 	var emptyArr [MAX_DIALOGUES]*dialogue
 	fresh := dialogue{root.speaker,key,0,emptyArr,0,0}
-	*root.children[root.childrenCount] = fresh
+	*addy.children[addy.childrenCount] = fresh
 }
 
 
