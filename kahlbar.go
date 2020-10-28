@@ -12,7 +12,7 @@ const MAX_DIALOGUES = 100
 const USER_DATA_SIZE = 3
 
 var NPCMap map[int]NPC
-var DialogueMap map[int]dialogue
+var DialogueMap map[int]*dialogue
 
 type NPC struct {
 	name string
@@ -89,7 +89,7 @@ func initializeNPCS(){
 }
 
 func initializeDialogue(){
-	DialogueMap = make(map[int]dialogue)
+	DialogueMap = make(map[int]*dialogue)
 	data,err := ioutil.ReadFile("dialogue.dialogue")
 	if err!=nil{
 		fmt.Println("Dialogue file damaged or missing")
@@ -119,7 +119,7 @@ func initializeDialogue(){
 			var children [MAX_DIALOGUES]*dialogue
 			cleanMessage,order := getOrder(message)
 			dialogue1 := dialogue{npc_unit,cleanMessage,0,children,order,b}
-			DialogueMap[b] = dialogue1
+			DialogueMap[b] = &dialogue1
 		}
 		fmt.Println(section_name)
 		fmt.Println(section_id)
@@ -127,8 +127,9 @@ func initializeDialogue(){
 }
 
 
-func insert(root dialogue,key string,order int){
+func insert(root *dialogue,key string,order int){
 	var addy *dialogue
+	addy = root
 	for order>1{
 		addy = root.children[root.childrenCount]
 		order--
@@ -155,7 +156,8 @@ func main(){
 	initializeDialogue()
 	for i:=2;i<len(DialogueMap);i++{
 		fmt.Println(DialogueMap[1])
-		insert(DialogueMap[1],DialogueMap[i].text,DialogueMap[i].order)
+		tempDialogue := *DialogueMap[i]
+		insert(DialogueMap[1],tempDialogue.text,tempDialogue.order)
 		fmt.Println(DialogueMap[1])
 	}
 }
