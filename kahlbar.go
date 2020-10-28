@@ -127,19 +127,16 @@ func initializeDialogue(){
 }
 
 
-//Why is this damn language so finnicky
-func insert(root dialogue,key dialogue)dialogue{
-	if &root == nil{
-		return key
+func insert(root dialogue,key string,order int){
+	for order>1{
+		root = *root.children[root.childrenCount]
+		order--
 	}
-	if root.order+1==key.order{
-		root.children[root.childrenCount] = &key
-		root.childrenCount++
-		return root
-	}
-	root.children[root.childrenCount] = insert(root.children[root.childrenCount],*key)
-	return root
+	var emptyArr [MAX_DIALOGUES]*dialogue
+	fresh := dialogue{root.speaker,key,0,emptyArr,0,0}
+	*root.children[root.childrenCount] = fresh
 }
+
 
 
 func treeInsert(toPlace dialogue,parent dialogue){
@@ -157,7 +154,7 @@ func main(){
 	initializeDialogue()
 	for i:=2;i<len(DialogueMap);i++{
 		fmt.Println(DialogueMap[1])
-		insert(DialogueMap[1],DialogueMap[i])
+		insert(DialogueMap[1],DialogueMap[i].text,DialogueMap[i].order)
 		fmt.Println(DialogueMap[1])
 	}
 }
