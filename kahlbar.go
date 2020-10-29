@@ -131,7 +131,7 @@ func insert(root *dialogue,key string,order int){
 	var addy *dialogue
 	addy = root
 	for order>1{
-		addy = root.children[root.childrenCount-1]
+		addy = addy.children[addy.childrenCount-1]
 		order--
 	}
 	var emptyArr [MAX_DIALOGUES]*dialogue
@@ -146,7 +146,6 @@ func treeInsert(toPlace dialogue,parent dialogue){
 	if toPlace.order-1 == parent.order{
 		parent.children[parent.childrenCount] = &toPlace
 		parent.childrenCount++
-		fmt.Println(parent.order)
 		return
 	}
 	treeInsert(toPlace,*parent.children[parent.childrenCount-1])
@@ -156,9 +155,8 @@ func main(){
 	initializeNPCS()
 	initializeDialogue()
 	for i:=2;i<len(DialogueMap);i++{
-		fmt.Println(DialogueMap[1])
 		tempDialogue := *DialogueMap[i]
 		insert(DialogueMap[1],tempDialogue.text,tempDialogue.order)
-		fmt.Println(DialogueMap[1])
 	}
+
 }
