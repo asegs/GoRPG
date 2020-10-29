@@ -8,7 +8,7 @@ import (
 )
 
 const MAX_ITEMS = 25
-const MAX_DIALOGUES = 100
+const MAX_DIALOGUES = 25
 const USER_DATA_SIZE = 3
 
 var NPCMap map[int]NPC
@@ -131,12 +131,13 @@ func insert(root *dialogue,key string,order int){
 	var addy *dialogue
 	addy = root
 	for order>1{
-		addy = root.children[root.childrenCount]
+		addy = root.children[root.childrenCount-1]
 		order--
 	}
 	var emptyArr [MAX_DIALOGUES]*dialogue
 	fresh := dialogue{root.speaker,key,0,emptyArr,0,0}
-	*addy.children[addy.childrenCount] = fresh
+	addy.children[addy.childrenCount] = &fresh
+	addy.childrenCount++
 }
 
 
