@@ -44,7 +44,7 @@ type event struct{
 type dialogue struct{
 	speaker NPC
 	text string
-	childrenCount int32
+	childrenCount int
 	children [MAX_DIALOGUES]*dialogue
 	order int
 	id int
@@ -98,12 +98,12 @@ func initializeDialogue(){
 	dialogueFile := string(data)
 	sections := strings.Split(dialogueFile,"~~~")
 	for i := 1;i<len(sections);i+=2{
-		header := strings.Split(sections[i],"<i>")
-		section_name := header[0]
-		section_id,err := strconv.Atoi(string(header[1]))
-		if err!=nil{
-			fmt.Println("Invalid ID "+ header[1])
-		}
+		//header := strings.Split(sections[i],"<i>")
+		//section_name := header[0]
+		//section_id,err := strconv.Atoi(string(header[1]))
+		//if err!=nil{
+			//fmt.Println("Invalid ID "+ header[1])
+		//}
 		body := sections[i+1]
 		lines := strings.Split(body,"\n")
 		//to handle forced newline, check for newline in future
@@ -121,13 +121,11 @@ func initializeDialogue(){
 			dialogue1 := dialogue{npc_unit,cleanMessage,0,children,order,b}
 			DialogueMap[b] = &dialogue1
 		}
-		fmt.Println(section_name)
-		fmt.Println(section_id)
 	}
 }
 
 
-func insert(root *dialogue,key string,order int){
+func insert(root *dialogue,key string,order int,speaker NPC,id int){
 	var addy *dialogue
 	addy = root
 	for order>1{
@@ -135,28 +133,55 @@ func insert(root *dialogue,key string,order int){
 		order--
 	}
 	var emptyArr [MAX_DIALOGUES]*dialogue
-	fresh := dialogue{root.speaker,key,0,emptyArr,0,0}
+	fresh := dialogue{speaker,key,0,emptyArr,order,id}
 	addy.children[addy.childrenCount] = &fresh
 	addy.childrenCount++
 }
 
 
 
-func treeInsert(toPlace dialogue,parent dialogue){
-	if toPlace.order-1 == parent.order{
-		parent.children[parent.childrenCount] = &toPlace
-		parent.childrenCount++
-		return
+func batchInsert(){
+	for i:=2;i<len(DialogueMap);i++{
+		tempDialogue := *DialogueMap[i]
+		insert(DialogueMap[1],tempDialogue.text,tempDialogue.order,tempDialogue.speaker,tempDialogue.id)
 	}
-	treeInsert(toPlace,*parent.children[parent.childrenCount-1])
-	return
+}
+
+func converse(){
+	var addy *dialogue
+	addy = DialogueMap[1]
+	for true{
+		name := string(addy.speaker.name)
+		message := string(addy.text)
+		fmt.Println(name)
+		fmt.Println(message+"\n")
+		if addy.childrenCount==0{
+			return
+		}
+		if addy.speaker.id==0{
+			addy = addy.children[0]
+			continue
+		}
+		fmt.Println("\n///////////////\nChoose the best option: ")
+		for i:=0;i<addy.childrenCount;i++{
+			fmt.Println(strconv.Itoa(i)+": "+addy.children[i].text)
+		}
+		fmt.Println("///////////////")
+    var input string
+    fmt.Scanln(&input)
+		choice,err := strconv.Atoi(input)
+		if err!=nil{
+			fmt.Println("Not a valid choice!")
+		}
+		addy = addy.children[choice]
+
+	}
 }
 func main(){
 	initializeNPCS()
 	initializeDialogue()
-	for i:=2;i<len(DialogueMap);i++{
-		tempDialogue := *DialogueMap[i]
-		insert(DialogueMap[1],tempDialogue.text,tempDialogue.order)
-	}
-
+	batchInsert()
+	converse()
 }
+
+//Allow multiple sets of dialogue now
