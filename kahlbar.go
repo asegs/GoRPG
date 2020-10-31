@@ -88,6 +88,20 @@ func initializeNPCS(){
 	}
 }
 
+func insert(root *dialogue,key string,order int,speaker NPC,id int){
+	var addy *dialogue
+	addy = root
+	for order>1{
+		addy = addy.children[addy.childrenCount-1]
+		order--
+	}
+	var emptyArr [MAX_DIALOGUES]*dialogue
+	fresh := dialogue{speaker,key,0,emptyArr,order,id}
+	addy.children[addy.childrenCount] = &fresh
+	addy.childrenCount++
+}
+
+
 func initializeDialogue(){
 	DialogueMap = make(map[int]*dialogue)
 	data,err := ioutil.ReadFile("dialogue.dialogue")
@@ -118,43 +132,23 @@ func initializeDialogue(){
 			npc_unit := NPCMap[speaker_id]
 			var children [MAX_DIALOGUES]*dialogue
 			cleanMessage,order := getOrder(message)
-			dialogue1 := dialogue{npc_unit,cleanMessage,0,children,order,b}
-			DialogueMap[b] = &dialogue1
+			if b==1{
+				DialogueMap[i] = &dialogue{npc_unit,cleanMessage,0,children,order,b}
+				continue
+			}
+			insert(DialogueMap[i],cleanMessage,order,npc_unit,b)
 		}
 	}
 }
 
 
-func insert(root *dialogue,key string,order int,speaker NPC,id int){
+func converse(index int){
 	var addy *dialogue
-	addy = root
-	for order>1{
-		addy = addy.children[addy.childrenCount-1]
-		order--
-	}
-	var emptyArr [MAX_DIALOGUES]*dialogue
-	fresh := dialogue{speaker,key,0,emptyArr,order,id}
-	addy.children[addy.childrenCount] = &fresh
-	addy.childrenCount++
-}
-
-
-
-func batchInsert(){
-	for i:=2;i<len(DialogueMap);i++{
-		tempDialogue := *DialogueMap[i]
-		insert(DialogueMap[1],tempDialogue.text,tempDialogue.order,tempDialogue.speaker,tempDialogue.id)
-	}
-}
-
-func converse(){
-	var addy *dialogue
-	addy = DialogueMap[1]
+	addy = DialogueMap[index]
+	fmt.Println(addy.speaker.description)
 	for true{
-		name := string(addy.speaker.name)
-		message := string(addy.text)
-		fmt.Println(name)
-		fmt.Println(message+"\n")
+		fmt.Println(addy.speaker.name)
+		fmt.Println(addy.text+"\n")
 		if addy.childrenCount==0{
 			return
 		}
@@ -180,8 +174,8 @@ func converse(){
 func main(){
 	initializeNPCS()
 	initializeDialogue()
-	batchInsert()
-	converse()
+	converse(1)
+	converse(3)
 }
 
 //Allow multiple sets of dialogue now
